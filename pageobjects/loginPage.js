@@ -1,33 +1,42 @@
-export default class loginPage {
+import BasePage from './basePage.js';
+import env from '../config/env.js';
 
+export default class LoginPage extends BasePage {
     constructor(page) {
-        this.page = page;
+        super(page);
         this.usernameInput = '#user-name';
         this.passwordInput = '#password';
-        this.loginButtonLocator = "#login-button";
-        this.errorMsg = "h3[data-test='error']";
+        this.loginButtonLocator = '#login-button';
         this.titleInventory = "span[data-test='title']";
     }
 
     async gotoLoginPage() {
-        await this.page.goto('https://www.saucedemo.com');
+        await this.goto('/');
     }
 
-    async userName(userValue) {
-        await this.page.locator(this.usernameInput).fill(userValue);
+    async enterUsername(value) {
+        await this.fill(this.usernameInput, value);
     }
 
-    async password(pwdValue) {
-        await this.page.locator(this.passwordInput).fill(pwdValue);
+    async enterPassword(value) {
+        await this.fill(this.passwordInput, value);
     }
 
-    async loginButton() {
-        await this.page.locator(this.loginButtonLocator).click();
+    async clickLoginButton() {
+        await this.click(this.loginButtonLocator);
     }
 
-    async loginSwag() {
-        await this.page.locator(this.usernameInput).fill('standard_user');
-        await this.page.locator(this.passwordInput).fill('secret_sauce');
-        await this.page.locator(this.loginButtonLocator).click();
+    async login(username, password) {
+        await this.enterUsername(username);
+        await this.enterPassword(password);
+        await this.clickLoginButton();
+    }
+
+    async loginAsStandardUser() {
+        await this.login(env.username, env.password);
+    }
+
+    async getErrorMessage() {
+        return this.getText(this.errorMsg);
     }
 }
