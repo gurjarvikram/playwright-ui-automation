@@ -1,5 +1,8 @@
 node_modules/
+# Ignore every .env variant (.env.local, .env.production, ...) but keep the template.
 .env
+.env.*
+!.env.example
 .idea/
 /test-results/
 /playwright-report/

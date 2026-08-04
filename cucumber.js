@@ -1,3 +1,7 @@
+// This config is evaluated before any support code, so dotenv must load here too
+// or CUCUMBER_* values set in .env are silently ignored.
+import 'dotenv/config';
+
 const isCI = !!process.env.CI;
 
 export default {
