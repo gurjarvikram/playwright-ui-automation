@@ -92,7 +92,7 @@ jobs:
 
       - name: Cache Playwright browsers
         id: browser-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           # Keyed on the Playwright version, not the lockfile hash: browsers are tied to the
@@ -151,7 +151,7 @@ jobs:
         run: echo "version=$(node -p "require('./node_modules/playwright/package.json').version")" >> "$GITHUB_OUTPUT"
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ steps.pw.outputs.version }}-${{ matrix.browser }}
@@ -230,7 +230,7 @@ jobs:
       # Allure renders the trend graph from the previous report's history folder. Without
       # this the report is a snapshot and "is this getting better or worse" is unanswerable.
       - name: Restore Allure history
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: allure-history
           key: allure-history-${{ github.run_id }}
