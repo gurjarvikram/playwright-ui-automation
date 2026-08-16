@@ -62,7 +62,7 @@
     "prettier": "^3.9.6"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^10.9.0",
+    "@cucumber/cucumber": "^13.2.1",
     "@faker-js/faker": "^9.0.0",
     "dotenv": "^16.4.5",
     "playwright": "^1.62.1"
