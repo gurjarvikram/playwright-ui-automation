@@ -1,0 +1,24 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels: [dependencies]
+    groups:
+      # Playwright's library and test packages share a version and must move together —
+      # split across two PRs they would each fail CI until both merged.
+      playwright:
+        patterns: ['playwright', '@playwright/*']
+      cucumber:
+        patterns: ['@cucumber/*', 'allure-cucumberjs']
+      tooling:
+        patterns: ['eslint*', '@eslint/*', 'prettier*', 'globals']
+
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: monthly
+    labels: [dependencies, ci]

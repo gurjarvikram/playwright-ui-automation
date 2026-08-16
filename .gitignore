@@ -1,13 +1,22 @@
 node_modules/
+
 # Ignore every .env variant (.env.local, .env.production, ...) but keep the template.
 .env
 .env.*
 !.env.example
+
 .idea/
+.vscode/
+
+# Failure artefacts: traces and videos.
+/artifacts/
+
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
 /allure-report/
 /allure-results/
 allure.log
+cucumber-summary.txt

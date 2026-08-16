@@ -1,43 +1,56 @@
+import { expect } from '@playwright/test';
 import BasePage from './basePage.js';
+import { inventoryObjects } from '../object-repository/index.js';
+
+const PAGE_TITLE = 'Products';
 
 export default class InventoryPage extends BasePage {
-    constructor(page) {
-        super(page);
-        this.productTitle = '.title';
-        this.productSort = '.product_sort_container';
-        this.itemName = "div[class='inventory_item_name']";
-        this.inventoryItem = '.inventory_item';
-        this.shoppingCartBadge = '.shopping_cart_badge';
+    get sortContainer() {
+        return this.page.locator(inventoryObjects.sortContainer);
     }
 
-    async getPageTitle() {
-        return this.getText(this.productTitle);
+    get activeSortOption() {
+        return this.page.locator(inventoryObjects.activeSortOption);
     }
 
-    async sortBy(label) {
-        await this.page.locator(this.productSort).selectOption({ label });
+    // --- Actions --------------------------------------------------------------------
+
+    async sortBy(optionLabel) {
+        await this.sortContainer.selectOption({ label: optionLabel });
+        // The dropdown writes the chosen label into the active-option element. Asserting on
+        // it here means the sort has actually been applied before the caller reads the list,
+        // without anyone needing a fixed wait.
+        await expect(this.activeSortOption).toHaveText(optionLabel);
     }
 
-    async getItemNames() {
-        return this.getAllTexts(this.itemName);
-    }
-
+    /**
+     * Adds the first `count` products in the current listing order.
+     *
+     * Scoped to the item tile and matched by role, so it adds the nth *visible* product
+     * without the test needing to know which product that happens to be.
+     */
     async addProductsToCart(count) {
-        const items = this.page.locator(this.inventoryItem);
-        for (let i = 0; i < count; i++) {
-            await items.nth(i).getByRole('button', { name: 'Add to cart' }).click();
+        for (let index = 0; index < count; index += 1) {
+            await this.items.nth(index).getByRole('button', { name: 'Add to cart' }).click();
         }
+        await this.assertCartBadgeCount(count);
     }
 
     async addFirstProductToCart() {
         await this.addProductsToCart(1);
     }
 
-    async openCart() {
-        await this.click(this.shoppingCartBadge);
+    // --- Assertions -----------------------------------------------------------------
+
+    async assertLoaded() {
+        await this.assertPath('/inventory.html');
+        await this.assertPageTitle(PAGE_TITLE);
     }
 
-    async isCartBadgeVisible() {
-        return this.isVisible(this.shoppingCartBadge);
+    /**
+     * @param {string[]} expectedOrder product names in the order they should appear
+     */
+    async assertItemOrder(expectedOrder) {
+        await expect(this.itemNames).toHaveText(expectedOrder);
     }
 }

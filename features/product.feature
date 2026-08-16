@@ -1,4 +1,4 @@
-@product
+@product @regression
 Feature: Product listing, cart and checkout
   As a logged in Sauce Demo user
   I want to browse, sort and purchase products
@@ -21,6 +21,7 @@ Feature: Product listing, cart and checkout
     Then the cart should be empty
     And the cart badge should not be visible
 
+  @negative
   Scenario: Checkout validation for required customer information
     Given I have added the first product to the cart
     And I proceed to checkout
@@ -33,6 +34,7 @@ Feature: Product listing, cart and checkout
     And I continue to the next step
     Then I should see the error message "Error: Postal Code is required"
 
+  @smoke
   Scenario Outline: Checkout process with <productCount> products
     Given I have added <productCount> products to the cart
     And I proceed to checkout
@@ -41,11 +43,12 @@ Feature: Product listing, cart and checkout
     Then I should be on the checkout overview page
     And the cart should contain <productCount> items
     And the checkout overview should display payment, shipping and price totals
+    And the order total should equal the item subtotal plus tax
     When I finish the checkout
     Then I should see the order confirmation message "Thank you for your order!"
     And the back to products button should be visible
 
     Examples:
       | productCount |
-      | 1             |
-      | 2             |
+      | 1            |
+      | 2            |

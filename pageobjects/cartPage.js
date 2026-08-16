@@ -1,34 +1,56 @@
+import { expect } from '@playwright/test';
 import BasePage from './basePage.js';
+import { cartObjects } from '../object-repository/index.js';
+
+const PAGE_TITLE = 'Your Cart';
 
 export default class CartPage extends BasePage {
-    constructor(page) {
-        super(page);
-        this.pageTitle = '.title';
-        this.itemName = "div[class='inventory_item_name']";
-        this.qtyLabel = '.cart_quantity_label';
-        this.descriptionLbl = '.cart_desc_label';
-        this.cartItem = '.cart_item';
-        this.continueShoppingBtn = '#continue-shopping';
-        this.checkoutBtn = '#checkout';
+    get quantityLabel() {
+        return this.page.locator(cartObjects.quantityLabel);
     }
 
-    async getPageTitle() {
-        return this.getText(this.pageTitle);
+    get descriptionLabel() {
+        return this.page.locator(cartObjects.descriptionLabel);
     }
 
-    async getItemNames() {
-        return this.getAllTexts(this.itemName);
+    get continueShoppingButton() {
+        return this.page.locator(cartObjects.continueShoppingButton);
     }
 
-    async getItemCount() {
-        return this.page.locator(this.itemName).count();
+    get checkoutButton() {
+        return this.page.locator(cartObjects.checkoutButton);
     }
+
+    // --- Actions --------------------------------------------------------------------
 
     async removeFirstItem() {
-        await this.page.locator(this.cartItem).first().getByRole('button', { name: 'Remove' }).click();
+        await this.items.first().getByRole('button', { name: 'Remove' }).click();
     }
 
-    async clickCheckout() {
-        await this.click(this.checkoutBtn);
+    async proceedToCheckout() {
+        await this.checkoutButton.click();
+    }
+
+    // --- Assertions -----------------------------------------------------------------
+
+    async assertLoaded() {
+        await this.assertPath('/cart.html');
+        await this.assertPageTitle(PAGE_TITLE);
+    }
+
+    /** The column headers and both call-to-action buttons the cart always shows. */
+    async assertStandardLabels() {
+        await expect(this.quantityLabel).toContainText('QTY');
+        await expect(this.descriptionLabel).toContainText('Description');
+        await expect(this.continueShoppingButton).toHaveText('Continue Shopping');
+        await expect(this.checkoutButton).toHaveText('Checkout');
+    }
+
+    async assertItemCount(expected) {
+        await expect(this.itemNames).toHaveCount(expected);
+    }
+
+    async assertEmpty() {
+        await expect(this.itemNames).toHaveCount(0);
     }
 }
