@@ -1,0 +1,7 @@
+# Every change needs a review from the framework owner.
+*                       @gurjarvikram
+
+# The layers where a careless change quietly weakens the whole suite.
+/object-repository/     @gurjarvikram
+/config/                @gurjarvikram
+/.github/workflows/     @gurjarvikram

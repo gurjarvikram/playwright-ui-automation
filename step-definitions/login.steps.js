@@ -1,12 +1,11 @@
 import { Given, When, Then } from '@cucumber/cucumber';
-import { expect } from '@playwright/test';
 
 Given('I am on the login page', async function () {
-    await this.loginPage.gotoLoginPage();
+    await this.loginPage.open();
 });
 
 When('I click the login button', async function () {
-    await this.loginPage.clickLoginButton();
+    await this.loginPage.submit();
 });
 
 When('I log in with username {string} and password {string}', async function (username, password) {
@@ -14,18 +13,18 @@ When('I log in with username {string} and password {string}', async function (us
 });
 
 When('I log in with valid credentials', async function () {
-    await this.loginPage.loginAsStandardUser();
+    await this.loginPage.loginAs('standard');
+});
+
+/** @param {string} role a key in fixtures/users.json, e.g. "lockedOut" */
+When('I log in as the {string} user', async function (role) {
+    await this.loginPage.loginAs(role);
 });
 
 Then('I should still be on the login page', async function () {
-    await expect(this.page).toHaveURL(/saucedemo\.com\/?$/);
-});
-
-Then('I should see the error message {string}', async function (message) {
-    await expect(this.page.locator(this.loginPage.errorMsg)).toContainText(message);
+    await this.loginPage.assertStillOnLoginPage();
 });
 
 Then('I should be redirected to the inventory page', async function () {
-    await this.page.locator(this.loginPage.titleInventory).waitFor({ state: 'visible' });
-    await expect(this.page).toHaveTitle('Swag Labs');
+    await this.inventoryPage.assertLoaded();
 });

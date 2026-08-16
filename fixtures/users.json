@@ -1,0 +1,37 @@
+{
+  "standard": {
+    "username": "standard_user",
+    "password": "secret_sauce",
+    "description": "Normal account. The default for every scenario that is not about a user's quirks."
+  },
+  "lockedOut": {
+    "username": "locked_out_user",
+    "password": "secret_sauce",
+    "description": "Rejected at login with 'Sorry, this user has been locked out.'"
+  },
+  "problem": {
+    "username": "problem_user",
+    "password": "secret_sauce",
+    "description": "Logs in, then renders broken images and misbehaving form fields."
+  },
+  "performanceGlitch": {
+    "username": "performance_glitch_user",
+    "password": "secret_sauce",
+    "description": "Logs in with a deliberate multi-second delay. Useful for proving waits are not fixed sleeps."
+  },
+  "error": {
+    "username": "error_user",
+    "password": "secret_sauce",
+    "description": "Logs in, then fails partway through checkout."
+  },
+  "visual": {
+    "username": "visual_user",
+    "password": "secret_sauce",
+    "description": "Logs in with deliberate visual defects. Reserved for visual-regression work."
+  },
+  "invalid": {
+    "username": "fakeusername",
+    "password": "fakepwd",
+    "description": "Not a real account. Drives the invalid-credentials scenario."
+  }
+}

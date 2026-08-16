@@ -1,29 +1,64 @@
 {
-  "name": "playwright-automation",
+  "name": "playwright-ui-automation",
   "version": "1.0.0",
+  "description": "Playwright + Cucumber (BDD) UI automation framework for the Swag Labs demo shop, with an Object Repository, Page Object Model, tag-based execution and GitHub Actions CI.",
+  "keywords": [
+    "playwright",
+    "cucumber",
+    "bdd",
+    "gherkin",
+    "page-object-model",
+    "object-repository",
+    "test-automation",
+    "e2e-testing",
+    "allure"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gurjarvikram/playwright-ui-automation.git"
+  },
+  "license": "MIT",
+  "private": true,
   "type": "module",
-  "main": "index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "test": "cucumber-js",
     "test:parallel": "cucumber-js --parallel 4",
     "test:serial": "cucumber-js --parallel 0",
+    "test:smoke": "cucumber-js --tags @smoke",
+    "test:regression": "cucumber-js --tags @regression",
+    "test:negative": "cucumber-js --tags @negative",
     "test:login": "cucumber-js --tags @login",
     "test:navigation": "cucumber-js --tags @navigation",
     "test:product": "cucumber-js --tags @product",
-    "clean": "node -e \"fs.rmSync('allure-results',{recursive:true,force:true});fs.rmSync('allure-report',{recursive:true,force:true})\"",
+    "test:chromium": "node scripts/run-suite.js --browser chromium",
+    "test:firefox": "node scripts/run-suite.js --browser firefox",
+    "test:webkit": "node scripts/run-suite.js --browser webkit",
+    "test:headed": "node scripts/run-suite.js --headed --serial",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "validate:steps": "cucumber-js --dry-run",
+    "verify": "npm run lint && npm run format:check && npm run validate:steps",
+    "pretest": "npm run clean",
+    "clean": "node -e \"const fs=require('fs');for(const d of ['allure-results','allure-report','artifacts'])fs.rmSync(d,{recursive:true,force:true});for(const f of ['allure.log','cucumber-summary.txt'])fs.rmSync(f,{force:true})\"",
     "report:generate": "allure generate allure-results --clean -o allure-report",
     "report:open": "allure open allure-report",
     "report": "npm test; npm run report:generate && npm run report:open"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.47.0",
     "@types/node": "^22.5.2",
     "allure-commandline": "^2.30.0",
-    "allure-cucumberjs": "^3.0.0"
+    "allure-cucumberjs": "^3.0.0",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.11.0",
+    "prettier": "^3.9.6"
   },
   "dependencies": {
     "@cucumber/cucumber": "^10.9.0",

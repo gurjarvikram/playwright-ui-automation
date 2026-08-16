@@ -1,42 +1,53 @@
+import { expect } from '@playwright/test';
 import BasePage from './basePage.js';
 import env from '../config/env.js';
+import { loginObjects } from '../object-repository/index.js';
 
 export default class LoginPage extends BasePage {
-    constructor(page) {
-        super(page);
-        this.usernameInput = '#user-name';
-        this.passwordInput = '#password';
-        this.loginButtonLocator = '#login-button';
-        this.titleInventory = "span[data-test='title']";
+    get usernameInput() {
+        return this.page.locator(loginObjects.usernameInput);
     }
 
-    async gotoLoginPage() {
+    get passwordInput() {
+        return this.page.locator(loginObjects.passwordInput);
+    }
+
+    get loginButton() {
+        return this.page.locator(loginObjects.loginButton);
+    }
+
+    // --- Actions --------------------------------------------------------------------
+
+    async open() {
         await this.goto('/');
-    }
-
-    async enterUsername(value) {
-        await this.fill(this.usernameInput, value);
-    }
-
-    async enterPassword(value) {
-        await this.fill(this.passwordInput, value);
-    }
-
-    async clickLoginButton() {
-        await this.click(this.loginButtonLocator);
+        await expect(this.loginButton).toBeVisible();
     }
 
     async login(username, password) {
-        await this.enterUsername(username);
-        await this.enterPassword(password);
-        await this.clickLoginButton();
+        await this.usernameInput.fill(username);
+        await this.passwordInput.fill(password);
+        await this.loginButton.click();
     }
 
-    async loginAsStandardUser() {
-        await this.login(env.username, env.password);
+    /**
+     * Logs in as a named account from fixtures/users.json.
+     *
+     * @param {string} [role] key in fixtures/users.json — defaults to the standard user
+     */
+    async loginAs(role = 'standard') {
+        const { username, password } = env.user(role);
+        await this.login(username, password);
     }
 
-    async getErrorMessage() {
-        return this.getText(this.errorMsg);
+    async submit() {
+        await this.loginButton.click();
+    }
+
+    // --- Assertions -----------------------------------------------------------------
+
+    /** The form is still on screen, i.e. the attempt did not navigate away. */
+    async assertStillOnLoginPage() {
+        await expect(this.loginButton).toBeVisible();
+        await this.assertPath('/');
     }
 }

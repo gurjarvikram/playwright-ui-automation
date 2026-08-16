@@ -1,36 +1,58 @@
 import BasePage from './basePage.js';
+import { checkoutObjects } from '../object-repository/index.js';
+
+const PAGE_TITLE = 'Checkout: Your Information';
 
 export default class CheckoutInformationPage extends BasePage {
-    constructor(page) {
-        super(page);
-        this.pageTitle = '.title';
-        this.firstNameInput = '#first-name';
-        this.lastNameInput = '#last-name';
-        this.zipCodeInput = '#postal-code';
-        this.continueBtn = '#continue';
+    get firstNameInput() {
+        return this.page.locator(checkoutObjects.firstNameInput);
     }
 
-    async getPageTitle() {
-        return this.getText(this.pageTitle);
+    get lastNameInput() {
+        return this.page.locator(checkoutObjects.lastNameInput);
     }
 
-    async fillFirstName(value) {
-        await this.fill(this.firstNameInput, value);
+    get postalCodeInput() {
+        return this.page.locator(checkoutObjects.postalCodeInput);
     }
 
-    async fillLastName(value) {
-        await this.fill(this.lastNameInput, value);
+    get continueButton() {
+        return this.page.locator(checkoutObjects.continueButton);
     }
 
-    async fillZipCode(value) {
-        await this.fill(this.zipCodeInput, value);
+    get cancelButton() {
+        return this.page.locator(checkoutObjects.cancelButton);
     }
 
-    async clickContinue() {
-        await this.click(this.continueBtn);
+    // --- Actions --------------------------------------------------------------------
+
+    async enterFirstName(value) {
+        await this.firstNameInput.fill(value);
     }
 
-    async getErrorMessage() {
-        return this.getText(this.errorMsg);
+    async enterLastName(value) {
+        await this.lastNameInput.fill(value);
+    }
+
+    async enterPostalCode(value) {
+        await this.postalCodeInput.fill(value);
+    }
+
+    /** @param {{ firstName: string, lastName: string, postalCode: string }} customer */
+    async enterCustomerDetails(customer) {
+        await this.enterFirstName(customer.firstName);
+        await this.enterLastName(customer.lastName);
+        await this.enterPostalCode(customer.postalCode);
+    }
+
+    async continueToOverview() {
+        await this.continueButton.click();
+    }
+
+    // --- Assertions -----------------------------------------------------------------
+
+    async assertLoaded() {
+        await this.assertPath('/checkout-step-one.html');
+        await this.assertPageTitle(PAGE_TITLE);
     }
 }
