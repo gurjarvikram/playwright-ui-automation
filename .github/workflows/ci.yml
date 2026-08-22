@@ -117,7 +117,7 @@ jobs:
 
       - name: Upload smoke failure artefacts
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: artifacts-smoke
           path: artifacts
@@ -180,7 +180,7 @@ jobs:
       # Raw results, one artefact per engine — they are merged into a single report below.
       - name: Upload Allure results
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: allure-results-${{ matrix.browser }}
           path: allure-results
@@ -189,7 +189,7 @@ jobs:
 
       - name: Upload failure artefacts
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: artifacts-${{ matrix.browser }}
           path: artifacts
@@ -250,7 +250,7 @@ jobs:
         run: rm -rf allure-history && cp -r allure-report/history allure-history || true
 
       - name: Upload report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: allure-report
           path: allure-report
