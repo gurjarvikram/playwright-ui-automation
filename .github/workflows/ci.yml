@@ -29,7 +29,9 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: '20'
+  # Node 20 reached end of life in April 2026. 22 is the current LTS and the floor for the
+  # toolchain: @cucumber/cucumber 13, ESLint 10 and faker 10 all refuse to run below it.
+  NODE_VERSION: '22'
 
 jobs:
   # ---------------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 ## Setup
 
 ```bash
-nvm use            # picks up .nvmrc (Node 20)
+nvm use            # picks up .nvmrc (Node 22)
 npm ci             # installs exactly what package-lock.json pins
 npx playwright install --with-deps chromium
 cp .env.example .env
