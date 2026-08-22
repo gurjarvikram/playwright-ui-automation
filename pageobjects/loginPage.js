@@ -1,6 +1,5 @@
 import { expect } from '@playwright/test';
 import BasePage from './basePage.js';
-import env from '../config/env.js';
 import { loginObjects } from '../object-repository/index.js';
 
 export default class LoginPage extends BasePage {
@@ -23,20 +22,17 @@ export default class LoginPage extends BasePage {
         await expect(this.loginButton).toBeVisible();
     }
 
+    /**
+     * Fills the form and submits it.
+     *
+     * Takes credentials rather than a role name: which account a scenario uses is a test-data
+     * decision, made in the step definition. A page object that looked the role up itself
+     * would be coupled to where the suite happens to keep its accounts today.
+     */
     async login(username, password) {
         await this.usernameInput.fill(username);
         await this.passwordInput.fill(password);
         await this.loginButton.click();
-    }
-
-    /**
-     * Logs in as a named account from fixtures/users.json.
-     *
-     * @param {string} [role] key in fixtures/users.json — defaults to the standard user
-     */
-    async loginAs(role = 'standard') {
-        const { username, password } = env.user(role);
-        await this.login(username, password);
     }
 
     async submit() {

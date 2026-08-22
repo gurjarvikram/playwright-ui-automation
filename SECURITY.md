@@ -3,7 +3,7 @@
 ## Scope
 
 This repository contains an automated test suite. It holds no application code and no
-production data. The credentials in `fixtures/users.json` are Sauce Labs' public demo
+production data. The credentials in `test-data/users.json` are Sauce Labs' public demo
 credentials, published by Sauce Labs on the login page of the site under test.
 
 ## Reporting a vulnerability

@@ -1,5 +1,5 @@
 import { setWorldConstructor, World } from '@cucumber/cucumber';
-import { faker } from '@faker-js/faker';
+import { buildCustomer } from '../test-data/index.js';
 import BasePage from '../pageobjects/basePage.js';
 import LoginPage from '../pageobjects/loginPage.js';
 import InventoryPage from '../pageobjects/inventoryPage.js';
@@ -40,18 +40,16 @@ export default class CustomWorld extends World {
     }
 
     /**
-     * Fresh customer details for this scenario.
+     * Fresh customer details for this scenario, from the test-data builder.
      *
-     * Generated per scenario rather than at module level: module-level data is created once
-     * per process and would then be shared by every scenario that worker runs, which is the
-     * classic way a parallel suite starts failing in ways it cannot reproduce serially.
+     * Called from the Before hook, so the data is scenario-scoped like everything else on the
+     * World. The World owns *when* data is created; `test-data/customer.js` owns what it looks
+     * like, which is what keeps a shape change out of this file.
+     *
+     * @param {object} [overrides] passed through to the builder to pin individual fields
      */
-    newCustomer() {
-        this.customer = {
-            firstName: faker.person.firstName(),
-            lastName: faker.person.lastName(),
-            postalCode: faker.location.zipCode(),
-        };
+    newCustomer(overrides) {
+        this.customer = buildCustomer(overrides);
 
         return this.customer;
     }

@@ -15,7 +15,7 @@ Feature: Login
 
   @negative
   Scenario: Unsuccessful login due to invalid credentials
-    When I log in with username "fakeusername" and password "fakepwd"
+    When I log in as the "invalid" user
     Then I should still be on the login page
     And I should see the error message "Epic sadface: Username and password do not match any user in this service"
 

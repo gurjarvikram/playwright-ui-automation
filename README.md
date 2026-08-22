@@ -59,28 +59,34 @@ failure.
 
 ## Architecture
 
-Four layers, each with one job. The rule that holds the suite together is that **a selector
-string appears in exactly one file**.
+Four layers, each with one job, plus a test-data layer feeding them. The two rules that hold
+the suite together are that **a selector string appears in exactly one file** and that
+**no credential or record is typed into a feature, a step or a page object**.
 
 ```
-features/*.feature            Gherkin — what the business expects
-        │  step text
-        ▼
-step-definitions/*.steps.js   One-line delegation. No selectors. No assertions.
-        │  method call
-        ▼
-pageobjects/*.js              How to act on a page, and how to assert it.
-        │  selector lookup
-        ▼
-object-repository/*.objects.js   Selector strings, and nothing else.
+                           features/*.feature            Gherkin — what the business expects
+                                   │  step text
+                                   ▼
+test-data/index.js  ── values ──▶  step-definitions/*.steps.js   One-line delegation.
+  users.js  accounts               │  method call
+  customer.js  generated records   ▼
+                           pageobjects/*.js              How to act, and how to assert.
+                                   │  selector lookup
+                                   ▼
+                           object-repository/*.objects.js   Selector strings, and nothing else.
 ```
 
-| Layer                | Knows about                                | Never contains        |
-| -------------------- | ------------------------------------------ | --------------------- |
-| `features/`          | Business behaviour, in Gherkin             | Selectors, code       |
-| `step-definitions/`  | Turning a sentence into a page-object call | Selectors, assertions |
-| `pageobjects/`       | How to act on and assert a page            | Raw selector strings  |
-| `object-repository/` | Selector strings, and nothing else         | Behaviour, assertions |
+| Layer                | Knows about                                | Never contains          |
+| -------------------- | ------------------------------------------ | ----------------------- |
+| `features/`          | Business behaviour, in Gherkin             | Selectors, code         |
+| `step-definitions/`  | Turning a sentence into a page-object call | Selectors, assertions   |
+| `pageobjects/`       | How to act on and assert a page            | Raw selectors, raw data |
+| `object-repository/` | Selector strings, and nothing else         | Behaviour, assertions   |
+| `test-data/`         | Accounts and generated records             | Selectors, page logic   |
+
+The data layer is entered from the step definition, which resolves the values and passes them
+down. A page object therefore never knows where its data came from, which is what lets the
+same `loginPage.login()` serve a fixture today and an account created through an API later.
 
 When the UI changes, the fix is a one-line edit in the object repository and nothing else in
 the suite moves. Two supporting pieces sit beside those layers:
@@ -250,9 +256,12 @@ playwright-ui-automation/
 ├── config/
 │   ├── environments.json             # baseUrl per environment — no URL in code
 │   ├── resolve-environment.js        # Picks the environment, fails loudly if unknown
-│   └── env.js                        # Browser, headless, artefacts, credential resolution
-├── fixtures/
-│   └── users.json                    # Test accounts, keyed by role
+│   └── env.js                        # Browser, headless, artefacts — no test data
+├── test-data/                        # What the suite feeds the application
+│   ├── users.json                    # Test accounts, keyed by role
+│   ├── users.js                      # getUser(role), plus the standard-user env override
+│   ├── customer.js                   # buildCustomer() — generated checkout details
+│   └── index.js                      # Barrel — step definitions import from here
 ├── support/
 │   ├── world.js                      # Cucumber World — page objects and per-scenario data
 │   ├── logger.js                     # Structured, worker-attributed logging
@@ -286,6 +295,7 @@ repository secrets.
 | `TRACE`            | `retain-on-failure`                    | `off`, `retain-on-failure` or `on`                       |
 | `VIDEO`            | `off` local, `retain-on-failure` in CI | `off`, `retain-on-failure` or `on`                       |
 | `ARTIFACTS_DIR`    | `artifacts`                            | Where traces and videos are written                      |
+| `FAKER_SEED`       | _(unset)_                              | Makes generated checkout data repeatable                 |
 | `LOG_LEVEL`        | `info`                                 | `debug`, `info`, `warn` or `error`                       |
 | `LOG_FORMAT`       | `text`                                 | `json` for one JSON object per line                      |
 
@@ -312,18 +322,50 @@ Resolution order is `SAUCE_BASE_URL` → the `TEST_ENV` entry → `production`. 
 the whole suite against the wrong site and still report green. Every run logs its target, and
 the value is written into the Allure report's environment widget.
 
-### Test accounts
+### Test data
 
-Accounts live in [`fixtures/users.json`](fixtures/users.json), keyed by role, and are reached
-through `env.user(role)`:
+Everything the suite types into the application comes from `test-data/`, reached through its
+barrel. Nothing below the step definitions imports it.
+
+**Fixed accounts** live in [`test-data/users.json`](test-data/users.json), keyed by role, and
+are read with `getUser(role)`. A scenario names the role, never the credentials:
+
+```gherkin
+When I log in as the "lockedOut" user
+```
 
 ```js
-await this.loginPage.loginAs('lockedOut');
+When('I log in as the {string} user', async function (role) {
+    const { username, password } = getUser(role);
+    await this.loginPage.login(username, password);
+});
 ```
+
+An unknown role fails immediately and lists the roles that do exist, and a role missing a
+username or password is rejected when the file is loaded — so `npm run verify` catches a
+malformed data file in about a second, without launching a browser.
 
 `SAUCE_USERNAME` / `SAUCE_PASSWORD` override the **standard** user only. A scenario that names
 a specific account is about that account's behaviour, so an environment override there would
 quietly turn the test into something else.
+
+**Generated records** — the checkout customer — come from `buildCustomer()`, called once per
+scenario by the World and reached as `this.customer`. Nothing is generated at module scope: a
+module is evaluated once per worker process, so module-level data would be shared by every
+scenario that worker runs, which is the classic way a parallel suite starts failing in ways it
+cannot reproduce serially. Individual fields can be pinned when a scenario is about a specific
+value:
+
+```js
+this.newCustomer({ postalCode: 'SW1A 1AA' });
+```
+
+Set `FAKER_SEED` to make a run repeatable when a generated value is implicated in a failure.
+Each worker seeds its own copy of faker, so pair it with `CUCUMBER_WORKERS=0`:
+
+```bash
+FAKER_SEED=42 CUCUMBER_WORKERS=0 npm test
+```
 
 ### Runner defaults
 
@@ -484,6 +526,10 @@ docker run --rm -v "$PWD/allure-results:/suite/allure-results" playwright-ui-aut
     });
     ```
 
+    If the scenario needs data, this is where it is resolved — `getUser(role)` for an account,
+    `this.customer` for the generated record — and passed down as values. Add a new account or
+    record to `test-data/` rather than typing it into the feature or the page object.
+
 5. **Prove the test can fail.** Break the expectation on purpose, confirm a red run, then
    restore it. An assertion that has never failed has never been verified.
 
@@ -509,12 +555,15 @@ docker run --rm -v "$PWD/allure-results:/suite/allure-results" playwright-ui-aut
 - **Assertions** — derive the expected value from the test data, not from the DOM you are
   checking. Comparing a page's rendering against itself always passes. The checkout total is
   asserted as subtotal plus tax for exactly this reason.
-- **Test data** — generate per-scenario data in the World (`newCustomer()`). Module-level data
-  is created once per worker process and leaks between scenarios, which is the classic way a
-  parallel suite starts failing in ways it cannot reproduce serially.
+- **Test data** — every account and every generated record comes from `test-data/`, through its
+  barrel, and is resolved in the step definition. A credential typed into a `.feature`, a step
+  or a page object is the same defect as a selector typed into a step. Per-scenario data is
+  built in the World (`newCustomer()`); module-level data is created once per worker process
+  and leaks between scenarios, which is the classic way a parallel suite starts failing in
+  ways it cannot reproduce serially.
 - **`this` in step definitions** — use `function`, never an arrow. An arrow function loses the
   Cucumber World and fails at run time.
-- **Credentials** — those in `fixtures/users.json` are the demo site's public credentials. Real
+- **Credentials** — those in `test-data/users.json` are the demo site's public credentials. Real
   credentials belong in environment variables locally and in repository secrets in CI. A
   secret that has been committed must be rotated; rewriting history does not invalidate it.
 

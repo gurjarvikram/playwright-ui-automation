@@ -1,4 +1,5 @@
 import { Given, Then } from '@cucumber/cucumber';
+import { getUser } from '../test-data/index.js';
 
 /**
  * Steps used by more than one feature.
@@ -9,8 +10,10 @@ import { Given, Then } from '@cucumber/cucumber';
  */
 
 Given('I am logged in as a standard user', async function () {
+    const { username, password } = getUser('standard');
+
     await this.loginPage.open();
-    await this.loginPage.loginAs('standard');
+    await this.loginPage.login(username, password);
     await this.inventoryPage.assertLoaded();
 });
 
