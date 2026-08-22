@@ -1,10 +1,10 @@
 # Playwright UI Automation Framework
 
 [![CI](https://github.com/gurjarvikram/playwright-ui-automation/actions/workflows/ci.yml/badge.svg)](https://github.com/gurjarvikram/playwright-ui-automation/actions/workflows/ci.yml)
-[![Playwright](https://img.shields.io/badge/Playwright-1.47-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev/)
+[![Playwright](https://img.shields.io/badge/Playwright-1.62-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev/)
 [![Cucumber](https://img.shields.io/badge/Cucumber-BDD-23D96C?logo=cucumber&logoColor=white)](https://cucumber.io/)
 [![Allure](https://img.shields.io/badge/Allure-Report-FF6A00)](https://allurereport.org/)
-[![Node](https://img.shields.io/badge/Node-%3E%3D20-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Node](https://img.shields.io/badge/Node-%3E%3D22-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 End-to-end UI automation for the [Swag Labs](https://www.saucedemo.com) demo shop, built with
@@ -104,7 +104,7 @@ the suite moves. Two supporting pieces sit beside those layers:
 
 | Tool                                                                 | Purpose                                              |
 | -------------------------------------------------------------------- | ---------------------------------------------------- |
-| [Playwright](https://playwright.dev/) 1.47                           | Browser automation and auto-retrying `expect`        |
+| [Playwright](https://playwright.dev/) 1.62                           | Browser automation and auto-retrying `expect`        |
 | [@cucumber/cucumber](https://github.com/cucumber/cucumber-js) 10     | Gherkin runner, tag filtering, parallel workers      |
 | [Allure](https://allurereport.org/) 2                                | Reporting, with trend history and failure categories |
 | [@faker-js/faker](https://fakerjs.dev/) 9                            | Per-scenario checkout customer data                  |
