@@ -51,12 +51,12 @@
     "report": "npm test; npm run report:generate && npm run report:open"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.5",
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.62.1",
     "@types/node": "^22.5.2",
     "allure-commandline": "^2.30.0",
     "allure-cucumberjs": "^3.0.0",
-    "eslint": "^9.39.5",
+    "eslint": "^10.8.1",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.11.0",
     "prettier": "^3.9.6"
