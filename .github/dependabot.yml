@@ -7,6 +7,13 @@ updates:
       day: monday
     open-pull-requests-limit: 5
     labels: [dependencies]
+    ignore:
+      # @types/node describes the runtime, so it must track the Node major the suite runs on
+      # (22 — see .nvmrc and engines), not the newest published types. Ahead of the runtime it
+      # autocompletes APIs that do not exist at run time. Raise this with the Node floor.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+
     groups:
       # Playwright's library and test packages share a version and must move together —
       # split across two PRs they would each fail CI until both merged.
