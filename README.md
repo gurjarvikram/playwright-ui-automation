@@ -105,7 +105,7 @@ the suite moves. Two supporting pieces sit beside those layers:
 | Tool                                                                 | Purpose                                              |
 | -------------------------------------------------------------------- | ---------------------------------------------------- |
 | [Playwright](https://playwright.dev/) 1.62                           | Browser automation and auto-retrying `expect`        |
-| [@cucumber/cucumber](https://github.com/cucumber/cucumber-js) 10     | Gherkin runner, tag filtering, parallel workers      |
+| [@cucumber/cucumber](https://github.com/cucumber/cucumber-js) 13     | Gherkin runner, tag filtering, parallel workers      |
 | [Allure](https://allurereport.org/) 2                                | Reporting, with trend history and failure categories |
 | [@faker-js/faker](https://fakerjs.dev/) 9                            | Per-scenario checkout customer data                  |
 | [dotenv](https://github.com/motdotla/dotenv)                         | Local `.env` values, keeping secrets out of the repo |
