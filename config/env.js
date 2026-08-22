@@ -1,11 +1,13 @@
 import 'dotenv/config';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
 import resolveEnvironment from './resolve-environment.js';
 
-const here = dirname(fileURLToPath(import.meta.url));
-const users = JSON.parse(readFileSync(join(here, '..', 'fixtures', 'users.json'), 'utf8'));
+/**
+ * How a run is configured: which site, which engine, and what to keep when a scenario fails.
+ *
+ * Deliberately holds no test data. What the suite types into the application lives in
+ * `test-data/`, reached through its barrel. Keeping the two apart is what stops this file
+ * growing into the junk drawer every framework eventually acquires.
+ */
 
 const SUPPORTED_BROWSERS = ['chromium', 'firefox', 'webkit'];
 const RETENTION_MODES = ['off', 'retain-on-failure', 'on'];
@@ -47,29 +49,4 @@ export default {
     trace: oneOf('TRACE', RETENTION_MODES, 'retain-on-failure'),
     video: oneOf('VIDEO', RETENTION_MODES, isCI ? 'retain-on-failure' : 'off'),
     artifactsDir: process.env.ARTIFACTS_DIR?.trim() || 'artifacts',
-
-    /**
-     * Credentials for a named account from fixtures/users.json.
-     *
-     * SAUCE_USERNAME / SAUCE_PASSWORD override the standard user only. Scenarios that name a
-     * specific account (locked out, problem, ...) are about that account's behaviour, so an
-     * env override there would quietly turn the test into something else.
-     */
-    user(role = 'standard') {
-        if (!Object.hasOwn(users, role)) {
-            const known = Object.keys(users).join(', ');
-            throw new Error(`Unknown user role "${role}". Known roles: ${known}.`);
-        }
-
-        const user = users[role];
-
-        if (role === 'standard') {
-            return {
-                username: process.env.SAUCE_USERNAME?.trim() || user.username,
-                password: process.env.SAUCE_PASSWORD?.trim() || user.password,
-            };
-        }
-
-        return { username: user.username, password: user.password };
-    },
 };

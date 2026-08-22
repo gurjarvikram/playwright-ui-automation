@@ -1,7 +1,7 @@
 {
   "name": "playwright-ui-automation",
   "version": "1.0.0",
-  "description": "Playwright + Cucumber (BDD) UI automation framework for the Swag Labs demo shop, with an Object Repository, Page Object Model, tag-based execution and GitHub Actions CI.",
+  "description": "Playwright + Cucumber (BDD) UI automation framework for the Swag Labs demo shop, with an Object Repository, Page Object Model, a dedicated test-data layer, tag-based execution and GitHub Actions CI.",
   "keywords": [
     "playwright",
     "cucumber",
@@ -9,6 +9,7 @@
     "gherkin",
     "page-object-model",
     "object-repository",
+    "test-data",
     "test-automation",
     "e2e-testing",
     "allure"

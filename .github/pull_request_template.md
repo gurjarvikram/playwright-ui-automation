@@ -9,6 +9,7 @@
 ## Layering
 
 - [ ] Selectors live in `object-repository/`, not in a page object, step definition or feature
+- [ ] Accounts and records come from `test-data/` — no credentials in a feature or page object
 - [ ] Step definitions delegate to page objects — no selectors, no assertions
 - [ ] Assertions are derived from test data, not re-read from the element under test
 

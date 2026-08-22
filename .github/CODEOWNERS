@@ -4,4 +4,5 @@
 # The layers where a careless change quietly weakens the whole suite.
 /object-repository/     @gurjarvikram
 /config/                @gurjarvikram
+/test-data/             @gurjarvikram
 /.github/workflows/     @gurjarvikram

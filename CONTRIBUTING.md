@@ -14,24 +14,31 @@ a run in CI.
 
 ## The layering rule
 
-Four layers, each with exactly one job. Almost every review comment on this repository is
-about a change that crossed one of these lines.
+Four layers, each with exactly one job, plus a test-data layer that feeds them. Almost every
+review comment on this repository is about a change that crossed one of these lines.
 
-| Layer                | Knows about                                | Never contains        |
-| -------------------- | ------------------------------------------ | --------------------- |
-| `features/`          | Business behaviour, in Gherkin             | Selectors, code       |
-| `step-definitions/`  | Turning a sentence into a page-object call | Selectors, assertions |
-| `pageobjects/`       | How to act on and assert a page            | Raw selector strings  |
-| `object-repository/` | Selector strings, and nothing else         | Behaviour, assertions |
+| Layer                | Knows about                                | Never contains          |
+| -------------------- | ------------------------------------------ | ----------------------- |
+| `features/`          | Business behaviour, in Gherkin             | Selectors, code         |
+| `step-definitions/`  | Turning a sentence into a page-object call | Selectors, assertions   |
+| `pageobjects/`       | How to act on and assert a page            | Raw selectors, raw data |
+| `object-repository/` | Selector strings, and nothing else         | Behaviour, assertions   |
+| `test-data/`         | Accounts and generated records             | Selectors, page logic   |
 
 A selector string appears in exactly one file. When the UI changes, the fix is a one-line edit
 in the object repository and nothing else in the suite moves.
 
+The same applies to data: a credential or a record appears in exactly one file, and the step
+definition resolves it and passes it down. A username typed into a `.feature` or looked up
+inside a page object is the same defect as a selector typed into a step.
+
 ## Adding a test
 
 1. **Describe the behaviour** in a `.feature` file and tag it — feature-level tags for the
-   area and the tier, scenario-level tags for `@smoke` and `@negative`.
-2. **Register the selector** in the matching `object-repository/*.objects.js` file.
+   area and the tier, scenario-level tags for `@smoke` and `@negative`. Name the data it needs
+   (a user role), never the values.
+2. **Register the selector** in the matching `object-repository/*.objects.js` file, and any
+   new account or record in `test-data/`.
 3. **Add the interaction and its assertion** to the page object. Assertions belong here, not
    in the step definition.
 4. **Wire the step**, as a one-line delegation.
@@ -54,8 +61,10 @@ Step five is not optional. An assertion that has never failed has never been ver
   immediately, which is the intended safety net.
 - **Assertions** — derive the expected value from the test data, not from the DOM you are
   checking. Comparing a page's rendering against itself always passes.
-- **Test data** — generate per-scenario data in the World (`newCustomer()`). Module-level data
-  is created once per worker process and leaks between scenarios.
+- **Test data** — accounts and generated records come from `test-data/`, through its barrel,
+  and are resolved in the step definition. Per-scenario data is built in the World
+  (`newCustomer()`); module-level data is created once per worker process and leaks between
+  scenarios. Set `FAKER_SEED` with `CUCUMBER_WORKERS=0` to reproduce a generated value.
 - **`this` in step definitions** — use `function`, never an arrow. An arrow function loses the
   Cucumber World and fails at run time.
 
