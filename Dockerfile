@@ -5,7 +5,7 @@
 # Keep this tag in step with the "playwright" dependency; Dependabot updates the package,
 # not this line. The image also supplies the container's Node, so the tag governs whether the
 # container satisfies the "engines" floor in package.json.
-FROM mcr.microsoft.com/playwright:v1.47.0-jammy
+FROM mcr.microsoft.com/playwright:v1.62.1-jammy
 
 WORKDIR /suite
 
