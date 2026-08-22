@@ -3,7 +3,8 @@
 # run reproduce a CI run exactly — WebKit in particular will not launch without them.
 #
 # Keep this tag in step with the "playwright" dependency; Dependabot updates the package,
-# not this line.
+# not this line. The image also supplies the container's Node, so the tag governs whether the
+# container satisfies the "engines" floor in package.json.
 FROM mcr.microsoft.com/playwright:v1.47.0-jammy
 
 WORKDIR /suite

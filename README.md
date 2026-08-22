@@ -118,14 +118,14 @@ the suite moves. Two supporting pieces sit beside those layers:
 
 | Requirement                    | Version                                  |
 | ------------------------------ | ---------------------------------------- |
-| [Node.js](https://nodejs.org/) | `>= 20` (see [`.nvmrc`](.nvmrc))         |
-| npm                            | `>= 10` (ships with Node 20)             |
+| [Node.js](https://nodejs.org/) | `>= 22` (see [`.nvmrc`](.nvmrc))         |
+| npm                            | `>= 10` (ships with Node 22)             |
 | Java                           | `17+`, only to generate an Allure report |
 | OS                             | Linux, macOS or Windows                  |
 
 ```bash
 nvm use          # picks up .nvmrc
-node --version   # v20.x
+node --version   # v22.x
 ```
 
 Browser engines are installed by Playwright itself, not by your package manager:
