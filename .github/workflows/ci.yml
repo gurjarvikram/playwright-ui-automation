@@ -215,7 +215,7 @@ jobs:
 
       # allure-commandline is a JVM tool. ubuntu-latest ships a JDK today, but that is not
       # contractual — pin it so report generation cannot break under us.
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
