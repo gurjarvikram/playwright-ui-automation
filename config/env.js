@@ -49,4 +49,24 @@ export default {
     trace: oneOf('TRACE', RETENTION_MODES, 'retain-on-failure'),
     video: oneOf('VIDEO', RETENTION_MODES, isCI ? 'retain-on-failure' : 'off'),
     artifactsDir: process.env.ARTIFACTS_DIR?.trim() || 'artifacts',
+
+    /**
+     * Cucumber's timeouts, which apply to steps and hooks alike and default to 5000 ms.
+     *
+     * That default is wrong twice over. It sits exactly on Playwright's own 5000 ms web
+     * assertion timeout, so the two race and Cucumber usually wins — reporting "function
+     * timed out" and naming neither the locator nor the page. And it is far below what
+     * browser lifecycle costs: the Before hook opens a context with video recording and
+     * starts a trace, the After hook writes that trace to a zip and copies the video out.
+     * On WebKit with four workers on a shared runner those hooks exceed 5000 ms, which is
+     * what turned the nightly build red.
+     *
+     * So the step budget sits above Playwright's assertion timeout — a locator that never
+     * settles now fails as a Playwright error that names it — and the hook budget is sized
+     * for browser work rather than for a step.
+     */
+    timeouts: {
+        step: 30_000,
+        hook: 60_000,
+    },
 };
