@@ -56,7 +56,7 @@
     "@types/node": "^22.20.1",
     "allure-commandline": "^2.30.0",
     "allure-cucumberjs": "^3.0.0",
-    "eslint": "^10.8.1",
+    "eslint": "^10.9.1",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.11.0",
     "prettier": "^3.9.6"
