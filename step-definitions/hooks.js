@@ -1,4 +1,4 @@
-import { AfterAll, Before, BeforeAll, After, Status } from '@cucumber/cucumber';
+import { AfterAll, Before, BeforeAll, After, Status, setDefaultTimeout } from '@cucumber/cucumber';
 import { chromium, firefox, webkit } from 'playwright';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -8,6 +8,11 @@ import { writeAllureMetadata } from '../support/allure-metadata.js';
 
 const BROWSERS = { chromium, firefox, webkit };
 
+// Applies to every step. Above Playwright's own assertion timeout on purpose, so a locator
+// that never settles fails as a Playwright error naming it rather than as Cucumber's
+// locator-less "function timed out". See `timeouts` in config/env.js.
+setDefaultTimeout(env.timeouts.step);
+
 /**
  * One browser per worker process, reused across that worker's scenarios, with a fresh
  * BrowserContext per scenario. Launching a browser costs roughly a second; creating a
@@ -15,7 +20,9 @@ const BROWSERS = { chromium, firefox, webkit };
  */
 let browser;
 
-BeforeAll(async function () {
+// The lifecycle hooks get their own, larger budget: launching an engine, opening a context
+// with video recording, and writing a trace zip out are all browser work, not step work.
+BeforeAll({ timeout: env.timeouts.hook }, async function () {
     writeAllureMetadata();
 
     logger.info('Starting suite', {
@@ -32,7 +39,7 @@ BeforeAll(async function () {
     browser = await BROWSERS[env.browser].launch({ headless: env.headless });
 });
 
-Before(async function ({ pickle }) {
+Before({ timeout: env.timeouts.hook }, async function ({ pickle }) {
     const contextOptions = { viewport: env.viewport };
 
     if (env.video !== 'off') {
@@ -54,7 +61,7 @@ Before(async function ({ pickle }) {
     logger.debug('Scenario started', { scenario: pickle.name });
 });
 
-After(async function ({ pickle, result }) {
+After({ timeout: env.timeouts.hook }, async function ({ pickle, result }) {
     const failed = result?.status === Status.FAILED;
     const keep = failed || env.trace === 'on' || env.video === 'on';
     const slug = artefactSlug(pickle.name);
@@ -104,7 +111,7 @@ After(async function ({ pickle, result }) {
     }
 });
 
-AfterAll(async function () {
+AfterAll({ timeout: env.timeouts.hook }, async function () {
     await browser?.close();
 });
 
