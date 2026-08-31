@@ -64,7 +64,7 @@
   "dependencies": {
     "@cucumber/cucumber": "^13.2.1",
     "@faker-js/faker": "^10.6.0",
-    "dotenv": "^16.4.5",
+    "dotenv": "^17.4.2",
     "playwright": "^1.62.1"
   }
 }
