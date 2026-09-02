@@ -2,10 +2,12 @@ version: 2
 updates:
   - package-ecosystem: npm
     directory: '/'
+    # Monthly, not weekly: a portfolio repo wants dependencies that are demonstrably
+    # current, not a standing queue of one-line PRs to triage.
     schedule:
-      interval: weekly
+      interval: monthly
       day: monday
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
     labels: [dependencies]
     ignore:
       # @types/node describes the runtime, so it must track the Node major the suite runs on
@@ -15,17 +17,20 @@ updates:
         update-types: ['version-update:semver-major']
 
     groups:
-      # Playwright's library and test packages share a version and must move together —
-      # split across two PRs they would each fail CI until both merged.
-      playwright:
-        patterns: ['playwright', '@playwright/*']
-      cucumber:
-        patterns: ['@cucumber/*', 'allure-cucumberjs']
-      tooling:
-        patterns: ['eslint*', '@eslint/*', 'prettier*', 'globals']
+      # One PR for everything. This subsumes the old playwright/cucumber/tooling groups —
+      # `playwright` and `@playwright/*` share a version and must move together, and split
+      # across two PRs they would each fail CI until both merged. A catch-all guarantees it.
+      # The cost is that one failing bump holds up the rest; when that happens, drop the
+      # offending package into `ignore` rather than ungrouping.
+      all-dependencies:
+        patterns: ['*']
 
   - package-ecosystem: github-actions
     directory: '/'
     schedule:
       interval: monthly
+    open-pull-requests-limit: 2
     labels: [dependencies, ci]
+    groups:
+      actions:
+        patterns: ['*']
